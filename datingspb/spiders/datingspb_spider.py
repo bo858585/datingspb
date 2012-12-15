@@ -18,6 +18,15 @@ search_form_data = {
 	"submit.y": "16"
 }
 
+# Xpath of user profile link on main page     
+user_profile_link_xpath = "/html/body/table[2]/tr/td[2]/table[5]/tr/td/a/@href"
+
+# Main search page
+main_search_page_url = "http://datingspb.ru/search.php" 
+
+# Page for sending message to user
+send_message_to_user_page_url = "http://datingspb.ru/message.php?oid="
+
 class DatingspbSpider(BaseSpider):
     """
     Spider
@@ -27,22 +36,12 @@ class DatingspbSpider(BaseSpider):
     allowed_domains = ["datingspb.ru"]
     start_urls = ["http://datingspb.ru/search.php"]
 
-    # Xpath of user profile link on main page     
-    user_profile_link_xpath = "/html/body/table[2]/tr/td[2]/table[5]/tr/td/a/@href"
-
-    # Main search page
-    main_search_page = "http://datingspb.ru/search.php" 
-
-    # Page for sending message to user
-    send_message_to_user_page = "http://datingspb.ru/message.php?oid="
-
     def start_requests(self):
         """
         Make search with params on main page
         """   
-        
         try:  
-            return [FormRequest(url=main_search_page,
+            return [FormRequest(url=main_search_page_url,
                     formdata=search_form_data,
                     callback=self.explore_search_results)]
         except Exception, e:
@@ -63,7 +62,7 @@ class DatingspbSpider(BaseSpider):
                     splitted_href = href.replace("&", "=").split("=")             
                     oid_value_index = splitted_href.index("oid") + 1                
                     # Go to send message to user page by using oid
-                    yield Request(url=send_message_to_user_page + splitted_href[oid_value_index], callback=self.explore_user_profile)
+                    yield Request(url=send_message_to_user_page_url + splitted_href[oid_value_index], callback=self.explore_user_pm_page)
 	        except Exception, e:
                     print e
                     pass  
@@ -71,7 +70,7 @@ class DatingspbSpider(BaseSpider):
         except Exception, e:
             print e 
 
-    def explore_user_profile(self, response):
+    def explore_user_pm_page(self, response):
         """
         Goes to personal message to user form page
         """
