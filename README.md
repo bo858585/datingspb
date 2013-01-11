@@ -1,4 +1,0 @@
-datingspb
-=========
-
-Woman search accelerator
